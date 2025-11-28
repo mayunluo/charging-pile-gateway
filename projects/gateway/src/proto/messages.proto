@@ -1,0 +1,9 @@
+syntax = "proto3";
+package gateway;
+
+message Telemetry {
+  uint64 ts = 1;
+  double voltage = 2;
+  double current = 3;
+  double energy = 4;
+}
