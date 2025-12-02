@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Gateway Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="panel">
+    <h1>Gateway Admin</h1>
+    <div id="status">Loading...</div>
+    <h2>Config</h2>
+    <form id="cfgform">
+      <label>Key: <input id="cfgkey" value="version"></label><br>
+      <label>Value: <input id="cfgval" value=""></label><br>
+      <button type="button" onclick="setCfg()">Set Config</button>
+    </form>
+    <h2>Publish Telemetry</h2>
+    <form id="tele">
+      <label>Voltage: <input id="voltage" value="230"></label><br>
+      <label>Current: <input id="current" value="10"></label><br>
+      <label>Energy: <input id="energy" value="0"></label><br>
+      <button type="button" onclick="pub()">Publish</button>
+    </form>
+  </div>
+
+<script>
+function fetchStatus() {
+  fetch('/api/config').then(r=>r.json()).then(j=>{
+    document.getElementById('status').innerText = 'Version: ' + j.version;
+  }).catch(e=>{ document.getElementById('status').innerText = 'Error'; });
+}
+function setCfg(){
+  const key = document.getElementById('cfgkey').value;
+  const val = document.getElementById('cfgval').value;
+  fetch('/api/config_set', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({key:key, value:val})})
+    .then(()=>fetchStatus());
+}
+function pub(){
+  const v = document.getElementById('voltage').value;
+  const c = document.getElementById('current').value;
+  const e = document.getElementById('energy').value;
+  fetch(`/api/pubtele?voltage=${encodeURIComponent(v)}&current=${encodeURIComponent(c)}&energy=${encodeURIComponent(e)}`)
+    .then(()=>alert('published'));
+}
+window.onload = fetchStatus;
+</script>
+</body>
+</html>
